@@ -23,7 +23,8 @@
     "istanbul": "^0.3.13",
     "mocha": "^2.2.4",
     "mocha-lcov-reporter": "0.0.2",
-    "uglify-js": "^2.4.16"
+    "uglify-js": "^2.4.16",
+    "reactive": "git://github.com/rijs/reactive"
   },
   "dependencies": {
     "utilise": "git://github.com/utilise/utilise"
