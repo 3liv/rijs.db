@@ -1,5 +1,5 @@
 {
-  "name": "db",
+  "name": "rijs.db",
   "version": "0.0.0",
   "main": "dist",
   "browser": "./node_modules/utilise/identity.js",
@@ -24,9 +24,9 @@
     "mocha": "^2.2.4",
     "mocha-lcov-reporter": "0.0.2",
     "uglify-js": "^2.4.16",
-    "reactive": "git://github.com/rijs/reactive",
-    "data": "git://github.com/rijs/data",
-    "core": "git://github.com/rijs/core"
+    "rijs.reactive": "git://github.com/rijs/reactive",
+    "rijs.data": "git://github.com/rijs/data",
+    "rijs.core": "git://github.com/rijs/core"
   },
   "dependencies": {
     "utilise": "git://github.com/utilise/utilise"

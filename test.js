@@ -3,10 +3,10 @@
 var expect = require('chai').expect
   , promise = require('utilise/promise')
   , client = require('utilise/client')
-  , reactive = require('reactive')
+  , reactive = require('rijs.reactive')
+  , core = require('rijs.core')
+  , data = require('rijs.data')
   , path = require('path')
-  , core = require('core')
-  , data = require('data')
   , db = require('./')
   , mockdb
   , result
