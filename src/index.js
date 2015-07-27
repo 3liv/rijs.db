@@ -14,6 +14,8 @@ export default function db(ripple){
 
 function connection(ripple) {
   return function(config){
+    if (!config) return
+      
     is.str(config) && (config = {
       type    : (config = config.split('://')).shift()
     , user    : (config = config.join('://').split(':')).shift()

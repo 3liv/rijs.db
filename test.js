@@ -18,6 +18,11 @@ describe('Database', function(){
     result = undefined
   })
 
+  it('should do nothing if falsy given', function(){  
+    var ripple = adaptor(db(data(core())))
+    ripple.db(undefined)
+  })
+
   it('should initialise new connection', function(){  
     var ripple = adaptor(db(data(core())))
     ripple.db('mock://user:password@host:port/database')
