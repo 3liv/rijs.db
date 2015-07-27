@@ -22,7 +22,7 @@ function db(ripple) {
 
 function connection(ripple) {
   return function (config) {
-    if (!config) return;
+    if (!config) return ripple;
 
     is.str(config) && (config = {
       type: (config = config.split("://")).shift(),

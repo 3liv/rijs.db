@@ -20,7 +20,7 @@ describe('Database', function(){
 
   it('should do nothing if falsy given', function(){  
     var ripple = adaptor(db(data(core())))
-    ripple.db(undefined)
+    expect(ripple.db(undefined)).to.eql(ripple)
   })
 
   it('should initialise new connection', function(){  
