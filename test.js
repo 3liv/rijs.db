@@ -23,6 +23,18 @@ describe('Database', function(){
     expect(ripple.db(undefined)).to.eql(ripple)
   })
 
+  it('should do nothing if fail to parse', function(){  
+    var ripple = adaptor(db(data(core())))
+    expect(ripple.db('wat.com')).to.eql(ripple)
+    expect(ripple.db.connections.length).to.eql(0)
+  })
+
+  it('should do nothing if adaptor does not exist', function(){  
+    var ripple = adaptor(db(data(core())))
+    expect(ripple.db('type://user:password@host:port/database')).to.eql(ripple)
+    expect(ripple.db.connections.length).to.eql(0)
+  })
+
   it('should initialise new connection', function(){  
     var ripple = adaptor(db(data(core())))
     ripple.db('mock://user:password@host:port/database')
@@ -35,6 +47,16 @@ describe('Database', function(){
     , port: 'port'
     , database: 'database'
     })
+  })
+
+  it('should skip non-data resources', function(done){  
+    var ripple = adaptor(db(data(core())))
+    ripple.db('mock://user:password@host:port/table')
+    expect(ripple('non-data', 'text')).to.eql('text')
+    setTimeout(function(){ 
+      expect(ripple('non-data')).to.eql('text') 
+    }, 20)
+    setTimeout(done, 40)
   })
 
   it('should load from db', function(done){  

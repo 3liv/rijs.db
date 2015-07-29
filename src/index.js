@@ -2,9 +2,9 @@
 // Pipe resources to/from another source
 // -------------------------------------------
 export default function db(ripple){
-  log('creating')
-  
   if (client) return identity
+  
+  log('creating')
   ripple.db = connection(ripple)
   ripple.db.adaptors = {}
   ripple.db.connections = []
@@ -28,10 +28,12 @@ function connection(ripple) {
     if (values(config).some(not(Boolean))) 
       return err('incorrect connection string', config), ripple
 
-    ripple
+    var connection = (ripple.db.adaptors[config.type] || noop)(config)
+
+    connection && ripple
       .db
       .connections
-      .push((ripple.db.adaptors[config.type] || noop)(config))
+      .push(connection)
 
     return ripple
   }

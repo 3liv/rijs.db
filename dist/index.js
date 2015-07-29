@@ -9,11 +9,11 @@ var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["defau
 module.exports = db;
 
 function db(ripple) {
-  log("creating");
-
-  if (client) {
+  /* istanbul ignore next */
+if (client) {
     return identity;
-  }ripple.db = connection(ripple);
+  }log("creating");
+  ripple.db = connection(ripple);
   ripple.db.adaptors = {};
   ripple.db.connections = [];
   ripple.on("change", crud(ripple));
@@ -35,7 +35,9 @@ function connection(ripple) {
 
     if (values(config).some(not(Boolean))) return (err("incorrect connection string", config), ripple);
 
-    ripple.db.connections.push((ripple.db.adaptors[config.type] || noop)(config));
+    var connection = (ripple.db.adaptors[config.type] || noop)(config);
+
+    connection && ripple.db.connections.push(connection);
 
     return ripple;
   };
