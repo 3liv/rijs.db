@@ -145,7 +145,7 @@ describe('Database', function(){
   function update(ripple){ 
     return function(res, key, value){
       setTimeout(function(){
-        result = value[key]
+        result = value
       }, 0)
     }
   }
