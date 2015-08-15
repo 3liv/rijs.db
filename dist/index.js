@@ -49,11 +49,11 @@ function crud(ripple) {
 
     var key = _ref.key;
     var value = _ref.value;
-    var _ref$type = _ref.type;
-    var type = _ref$type === undefined ? "load" : _ref$type;
+    var type = _ref.type;
 
     if (!header("content-type", "application/data")(res)) return;
     if (header("silentdb")(res)) return delete res.headers.silentdb;
+    if (!type) return;
     log("crud", res.name, type);
 
     ripple.db.connections.forEach(function (con) {

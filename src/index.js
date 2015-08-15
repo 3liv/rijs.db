@@ -40,9 +40,10 @@ function connection(ripple) {
 }
 
 function crud(ripple) {
-  return function(res, {key, value, type = 'load'} = {}){
+  return function(res, {key, value, type} = {}){
     if (!header('content-type', 'application/data')(res)) return
     if (header('silentdb')(res)) return delete res.headers.silentdb
+    if (!type) return
     log('crud', res.name, type)
 
     ripple
