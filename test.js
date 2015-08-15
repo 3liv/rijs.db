@@ -112,6 +112,24 @@ describe('Database', function(){
     setTimeout(done, 60)
   })
 
+  it('should not trigger if not new resource', function(done){  
+    var ripple = adaptor(db(reactive(data(core()))))
+    ripple.db('mock://user:password@host:port/table')
+    expect(ripple('table')).to.eql([])
+    setTimeout(function(){ 
+      expect(ripple('table')).to.eql([{foo: 'bar', id: 1 }]) 
+      ripple('table', [])
+    }, 20)
+    setTimeout(function(){ 
+      expect(ripple('table')).to.eql([])
+      ripple('table').emit('change')
+    }, 40)
+    setTimeout(function(){ 
+      expect(ripple('table')).to.eql([])
+      done()
+    }, 60)
+  })
+
   function adaptor(ripple) {
     return ripple.db.adaptors.mock = mock, ripple
   }
