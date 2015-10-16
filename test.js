@@ -19,27 +19,24 @@ describe('Database', function(){
   })
 
   it('should do nothing if falsy given', function(){  
-    var ripple = adaptor(db(data(core())))
-    expect(ripple.db(undefined)).to.eql(ripple)
+    var ripple = db(adaptor(data(core())), { })
+    expect(ripple.connections.length).to.eql(0)
   })
 
   it('should do nothing if fail to parse', function(){  
-    var ripple = adaptor(db(data(core())))
-    expect(ripple.db('wat.com')).to.eql(ripple)
-    expect(ripple.db.connections.length).to.eql(0)
+    var ripple = db(adaptor(data(core())), { db: 'wat.com' })
+    expect(ripple.connections.length).to.eql(0)
   })
 
   it('should do nothing if adaptor does not exist', function(){  
-    var ripple = adaptor(db(data(core())))
-    expect(ripple.db('type://user:password@host:port/database')).to.eql(ripple)
-    expect(ripple.db.connections.length).to.eql(0)
+    var ripple = db(adaptor(data(core())), { db: 'type://user:password@host:port/database' })
+    expect(ripple.connections.length).to.eql(0)
   })
 
   it('should initialise new connection', function(){  
-    var ripple = adaptor(db(data(core())))
-    ripple.db('mock://user:password@host:port/database')
-    expect(ripple.db.adaptors).to.eql({ mock: mock })
-    expect(ripple.db.connections[0].config).to.eql({
+    var ripple = db(adaptor(data(core())), { db: 'mock://user:password@host:port/database' })
+    expect(ripple.adaptors).to.eql({ mock: mock })
+    expect(ripple.connections[0].config).to.eql({
       type: 'mock'
     , user: 'user'
     , password: 'password'
@@ -50,8 +47,7 @@ describe('Database', function(){
   })
 
   it('should skip non-data resources', function(done){  
-    var ripple = adaptor(db(data(core())))
-    ripple.db('mock://user:password@host:port/table')
+    var ripple = db(adaptor(data(core())), { db: 'mock://user:password@host:port/table' })
     expect(ripple('non-data', 'text')).to.eql('text')
     setTimeout(function(){ 
       expect(ripple('non-data')).to.eql('text') 
@@ -60,8 +56,7 @@ describe('Database', function(){
   })
 
   it('should load from db', function(done){  
-    var ripple = adaptor(db(data(core())))
-    ripple.db('mock://user:password@host:port/table')
+    var ripple = db(adaptor(data(core())), { db: 'mock://user:password@host:port/table' })
     expect(ripple('table')).to.eql([])
     setTimeout(function(){ 
       expect(ripple('table')).to.eql([{foo: 'bar', id: 1 }]) 
@@ -70,8 +65,7 @@ describe('Database', function(){
   })
 
   it('should push to db', function(done){  
-    var ripple = adaptor(db(reactive(data(core()))))
-    ripple.db('mock://user:password@host:port/table')
+    var ripple = db(adaptor(reactive(data(core()))), { db: 'mock://user:password@host:port/table' })
     ripple('table')
 
     setTimeout(function(){ 
@@ -84,8 +78,7 @@ describe('Database', function(){
   })
 
   it('should update to db', function(done){  
-    var ripple = adaptor(db(reactive(data(core()))))
-    ripple.db('mock://user:password@host:port/table')
+    var ripple = db(adaptor(reactive(data(core()))), {  db: 'mock://user:password@host:port/table' })
     ripple('table')
 
     setTimeout(function(){ 
@@ -98,8 +91,7 @@ describe('Database', function(){
   })
 
   it('should remove from db', function(done){  
-    var ripple = adaptor(db(reactive(data(core()))))
-    ripple.db('mock://user:password@host:port/table')
+    var ripple = db(adaptor(reactive(data(core()))), { db: 'mock://user:password@host:port/table' })
     ripple('table')
 
     setTimeout(function(){ 
@@ -113,8 +105,7 @@ describe('Database', function(){
   })
 
   it('should not trigger if not new resource', function(done){  
-    var ripple = adaptor(db(reactive(data(core()))))
-    ripple.db('mock://user:password@host:port/table')
+    var ripple = db(adaptor(reactive(data(core()))), { db: 'mock://user:password@host:port/table' })
     expect(ripple('table')).to.eql([])
     setTimeout(function(){ 
       expect(ripple('table')).to.eql([{foo: 'bar', id: 1 }]) 
@@ -131,7 +122,8 @@ describe('Database', function(){
   })
 
   function adaptor(ripple) {
-    return ripple.db.adaptors.mock = mock, ripple
+    ripple.adaptors = { mock: mock }
+    return ripple
   }
 
   function mock(config) {
@@ -169,8 +161,8 @@ describe('Database', function(){
   }
 
   function remove(ripple){ 
-    return function(res, key, value){
-      setTimeout(function(){
+    return function(res, key, value){ 
+      setTimeout(function(){ 
         result = value
       }, 0)
     }

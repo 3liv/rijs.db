@@ -1,14 +1,14 @@
 // -------------------------------------------
 // Pipe resources to/from another source
 // -------------------------------------------
-export default function db(ripple){
+export default function db(ripple, { db } = {}){
   if (client) return identity
   
   log('creating')
-  ripple.db = connection(ripple)
-  ripple.db.adaptors = {}
-  ripple.db.connections = []
-  ripple.on('change', crud(ripple))
+  ripple.adaptors = ripple.adaptors || {}
+  ripple.connections = []
+  ripple.on('change.db', crud(ripple))
+  connection(ripple)(db)
   return ripple
 }
 
@@ -16,6 +16,7 @@ function connection(ripple) {
   return function(config){
     if (!config) return ripple
 
+    // TODO Use built-in url parse
     is.str(config) && (config = {
       type    : (config = config.split('://')).shift()
     , user    : (config = config.join('://').split(':')).shift()
@@ -28,10 +29,9 @@ function connection(ripple) {
     if (values(config).some(not(Boolean))) 
       return err('incorrect connection string', config), ripple
 
-    var connection = (ripple.db.adaptors[config.type] || noop)(config)
+    var connection = (ripple.adaptors[config.type] || noop)(config)
 
     connection && ripple
-      .db
       .connections
       .push(connection)
 
@@ -39,7 +39,7 @@ function connection(ripple) {
   }
 }
 
-function crud(ripple) {
+function crud(ripple) { 
   return function(res, {key, value, type} = {}){
     if (!header('content-type', 'application/data')(res)) return
     if (header('silentdb')(res)) return delete res.headers.silentdb
@@ -47,7 +47,6 @@ function crud(ripple) {
     log('crud', res.name, type)
 
     ripple
-      .db
       .connections
       .forEach(con => con[type](silent(ripple))(res, key, value))
   }

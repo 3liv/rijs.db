@@ -9,14 +9,18 @@ var _interopRequire = function (obj) { return obj && obj.__esModule ? obj["defau
 module.exports = db;
 
 function db(ripple) {
+  var _ref = arguments[1] === undefined ? {} : arguments[1];
+
+  var db = _ref.db;
+
   /* istanbul ignore next */
 if (client) {
     return identity;
   }log("creating");
-  ripple.db = connection(ripple);
-  ripple.db.adaptors = {};
-  ripple.db.connections = [];
-  ripple.on("change", crud(ripple));
+  ripple.adaptors = ripple.adaptors || {};
+  ripple.connections = [];
+  ripple.on("change.db", crud(ripple));
+  connection(ripple)(db);
   return ripple;
 }
 
@@ -24,6 +28,7 @@ function connection(ripple) {
   return function (config) {
     if (!config) return ripple;
 
+    // TODO Use built-in url parse
     is.str(config) && (config = {
       type: (config = config.split("://")).shift(),
       user: (config = config.join("://").split(":")).shift(),
@@ -35,9 +40,9 @@ function connection(ripple) {
 
     if (values(config).some(not(Boolean))) return (err("incorrect connection string", config), ripple);
 
-    var connection = (ripple.db.adaptors[config.type] || noop)(config);
+    var connection = (ripple.adaptors[config.type] || noop)(config);
 
-    connection && ripple.db.connections.push(connection);
+    connection && ripple.connections.push(connection);
 
     return ripple;
   };
@@ -56,7 +61,7 @@ function crud(ripple) {
     if (!type) return;
     log("crud", res.name, type);
 
-    ripple.db.connections.forEach(function (con) {
+    ripple.connections.forEach(function (con) {
       return con[type](silent(ripple))(res, key, value);
     });
   };
