@@ -3,11 +3,11 @@
 var expect = require('chai').expect
   , promise = require('utilise/promise')
   , client = require('utilise/client')
-  , reactive = require('rijs.reactive')
-  , core = require('rijs.core')
-  , data = require('rijs.data')
+  , reactive = require('rijs.reactive').default
+  , core = require('rijs.core').default
+  , data = require('rijs.data').default
+  , db = require('./').default
   , path = require('path')
-  , db = require('./')
   , mockdb
   , result
 
@@ -16,6 +16,13 @@ describe('Database', function(){
   beforeEach(function(){
     mockdb = { table: [{ foo: 'bar', id: 1 }] }
     result = undefined
+  })
+
+  it('should initialise adaptors if does not exist', function(){  
+    var ripple = data(core())
+    expect(ripple.adaptors).to.not.be.ok
+    db(ripple)
+    expect(ripple.adaptors).to.be.ok
   })
 
   it('should do nothing if falsy given', function(){  

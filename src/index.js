@@ -2,8 +2,6 @@
 // Pipe resources to/from another source
 // -------------------------------------------
 export default function db(ripple, { db } = {}){
-  if (client) return identity
-  
   log('creating')
   ripple.adaptors = ripple.adaptors || {}
   ripple.connections = []
@@ -62,8 +60,6 @@ import values from 'utilise/values'
 import noop from 'utilise/noop'
 import key from 'utilise/key'
 import not from 'utilise/not'
-import log from 'utilise/log'
-import err from 'utilise/err'
 import is from 'utilise/is'
-err = err('[ri/db]')
-log = log('[ri/db]')
+var err = require('utilise/log')('[ri/db]')
+  , log = require('utilise/err')('[ri/db]')
