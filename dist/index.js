@@ -102,5 +102,5 @@ function silent(ripple) {
   };
 }
 
-var err = require('utilise/log')('[ri/db]'),
-    log = require('utilise/err')('[ri/db]');
+var err = require('utilise/err')('[ri/db]'),
+    log = require('utilise/log')('[ri/db]');

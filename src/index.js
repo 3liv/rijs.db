@@ -61,5 +61,5 @@ import noop from 'utilise/noop'
 import key from 'utilise/key'
 import not from 'utilise/not'
 import is from 'utilise/is'
-var err = require('utilise/log')('[ri/db]')
-  , log = require('utilise/err')('[ri/db]')
+var err = require('utilise/err')('[ri/db]')
+  , log = require('utilise/log')('[ri/db]')
