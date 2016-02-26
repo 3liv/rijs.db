@@ -3,11 +3,16 @@
 var expect = require('chai').expect
   , promise = require('utilise/promise')
   , client = require('utilise/client')
-  , reactive = require('rijs.reactive').default
+  , update = require('utilise/update')
+  , remove = require('utilise/remove')
+  , push = require('utilise/push')
+  , time = require('utilise/time')
+  , key = require('utilise/key')
   , core = require('rijs.core').default
   , data = require('rijs.data').default
   , db = require('./').default
   , path = require('path')
+  , deep = key
   , mockdb
   , result
 
@@ -56,76 +61,77 @@ describe('Database', function(){
   it('should skip non-data resources', function(done){  
     var ripple = db(adaptor(data(core())), { db: 'mock://user:password@host:port/table' })
     expect(ripple('non-data', 'text')).to.eql('text')
-    setTimeout(function(){ 
+    time(20, function(){ 
       expect(ripple('non-data')).to.eql('text') 
-    }, 20)
-    setTimeout(done, 40)
+    })
+    time(40, done)
   })
 
   it('should load from db', function(done){  
     var ripple = db(adaptor(data(core())), { db: 'mock://user:password@host:port/table' })
     expect(ripple('table')).to.eql([])
-    setTimeout(function(){ 
+    time(20, function(){ 
       expect(ripple('table')).to.eql([{foo: 'bar', id: 1 }]) 
-    }, 20)
-    setTimeout(done, 40)
+    })
+    time(40, done)
   })
 
   it('should push to db', function(done){  
-    var ripple = db(adaptor(reactive(data(core()))), { db: 'mock://user:password@host:port/table' })
+    var ripple = db(adaptor(data(core())), { db: 'mock://user:password@host:port/table' })
     ripple('table')
 
-    setTimeout(function(){ 
-      ripple('table').push({ a: 'b' })
-    }, 20)
-    setTimeout(function(){ 
+    time(20, function(){ 
+      var record = { a: 'b' }
+      push(record)(ripple('table'))
+    })
+    time(40, function(){ 
       expect(ripple('table')).to.eql([{foo: 'bar', id: 1 }, { a: 'b', id: 2 }]) 
-    }, 40)
-    setTimeout(done, 60)
+    })
+    time(60, done)
   })
 
   it('should update to db', function(done){  
-    var ripple = db(adaptor(reactive(data(core()))), {  db: 'mock://user:password@host:port/table' })
+    var ripple = db(adaptor(data(core())), {  db: 'mock://user:password@host:port/table' })
     ripple('table')
 
-    setTimeout(function(){ 
-      ripple('table')[0].foo = 'foo'
-    }, 20)
-    setTimeout(function(){ 
-      expect(result).to.eql({foo: 'foo', id: 1}) 
-    }, 40)
-    setTimeout(done, 60)
+    time(20, function(){ 
+      update('0.foo', 'foo')(ripple('table'))
+    })
+    time(40, function(){ 
+      expect(result).to.eql({ foo: 'foo', id: 1 }) 
+    })
+    time(60, done)
   })
 
   it('should remove from db', function(done){  
-    var ripple = db(adaptor(reactive(data(core()))), { db: 'mock://user:password@host:port/table' })
+    var ripple = db(adaptor(data(core())), { db: 'mock://user:password@host:port/table' })
     ripple('table')
 
-    setTimeout(function(){ 
-      delete ripple('table')[0]
-    }, 20)
-    setTimeout(function(){ 
-      expect(result).to.eql({foo: 'bar', id: 1}) 
+    time(20, function(){ 
+      remove(0)(ripple('table'))
+    })
+    time(40, function(){ 
+      expect(result).to.eql({ foo: 'bar', id: 1 }) 
       expect(ripple('table')).to.eql([]) 
-    }, 40)
-    setTimeout(done, 60)
+    })
+    time(60, done)
   })
 
-  it('should not trigger if not new resource', function(done){  
-    var ripple = db(adaptor(reactive(data(core()))), { db: 'mock://user:password@host:port/table' })
+  it('should not reload if not new resource', function(done){  
+    var ripple = db(adaptor(data(core())), { db: 'mock://user:password@host:port/table' })
     expect(ripple('table')).to.eql([])
-    setTimeout(function(){ 
+    time(20, function(){ 
       expect(ripple('table')).to.eql([{foo: 'bar', id: 1 }]) 
       ripple('table', [])
-    }, 20)
-    setTimeout(function(){ 
+    })
+    time(40, function(){ 
       expect(ripple('table')).to.eql([])
       ripple('table').emit('change')
-    }, 40)
-    setTimeout(function(){ 
+    })
+    time(60, function(){ 
       expect(ripple('table')).to.eql([])
       done()
-    }, 60)
+    })
   })
 
   function adaptor(ripple) {
@@ -135,43 +141,43 @@ describe('Database', function(){
 
   function mock(config) {
     return {
-      push: push
-    , update: update
-    , remove: remove
-    , load: load
+      add: dbadd
+    , update: dbupdate
+    , remove: dbremove
     , config: config
     }
   }
 
-  function load(ripple){ 
+  function dbload(ripple){ 
     return function(res){
-      setTimeout(function(){
-        ripple({ name: res.name, body: mockdb[res.name]})
-      }, 0)
+      time(0, function(){
+        ripple({ name: res.name, body: mockdb[res.name], headers: { db: { loaded: true }}})
+      })
     }
   }
 
-  function push(ripple){ 
+  function dbadd(ripple){ 
     return function(res, key, value){
-      setTimeout(function(){
+      time(0, function(){
         value.id = 2
-      }, 0)
+      })
     }
   }
 
-  function update(ripple){ 
+  function dbupdate(ripple){ 
     return function(res, key, value){
-      setTimeout(function(){
-        result = value
-      }, 0)
+      time(0, function(){
+        if (!key && !deep('headers.db.loaded')(res)) return dbload(ripple)(res)
+        if (key) result = res.body[key.split('.').shift()]
+      })
     }
   }
 
-  function remove(ripple){ 
+  function dbremove(ripple){ 
     return function(res, key, value){ 
-      setTimeout(function(){ 
+      time(0, function(){ 
         result = value
-      }, 0)
+      })
     }
   }
 

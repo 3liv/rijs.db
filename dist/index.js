@@ -53,7 +53,7 @@ var _ref = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[
   return ripple;
 }
 
-function connection(ripple) {
+var connection = function connection(ripple) {
   return function (config) {
     if (!config) return ripple;
 
@@ -69,38 +69,39 @@ function connection(ripple) {
 
     if ((0, _values2.default)(config).some((0, _not2.default)(Boolean))) return err('incorrect connection string', config), ripple;
 
-    var connection = (ripple.adaptors[config.type] || _noop2.default)(config);
+    var con = (ripple.adaptors[config.type] || _noop2.default)(config);
 
-    connection && ripple.connections.push(connection);
+    con && ripple.connections.push(con);
 
     return ripple;
   };
-}
+};
 
-function crud(ripple) {
-  return function (res) {
-    var _ref2 = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
+var crud = function crud(ripple) {
+  return function (name, change) {
+    var _ref2 = change || {};
 
     var key = _ref2.key;
     var value = _ref2.value;
     var type = _ref2.type;
+    var res = ripple.resources[name];
 
     if (!(0, _header2.default)('content-type', 'application/data')(res)) return;
     if ((0, _header2.default)('silentdb')(res)) return delete res.headers.silentdb;
     if (!type) return;
-    log('crud', res.name, type);
+    log('crud', name, type);
 
     ripple.connections.forEach(function (con) {
       return con[type](silent(ripple))(res, key, value);
     });
   };
-}
+};
 
-function silent(ripple) {
+var silent = function silent(ripple) {
   return function (res) {
     return (0, _key2.default)('headers.silentdb', true)(res), ripple(res);
   };
-}
+};
 
 var err = require('utilise/err')('[ri/db]'),
     log = require('utilise/log')('[ri/db]');
