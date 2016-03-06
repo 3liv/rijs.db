@@ -33,8 +33,7 @@
     "mocha-lcov-reporter": "*",
     "uglify-js": "*",
     "rijs.core": "*",
-    "rijs.data": "*",
-    "rijs.reactive": "*"
+    "rijs.data": "*"
   },
   "dependencies": {
     "utilise": "*"
