@@ -23,7 +23,7 @@ const connect = ripple => (id, config) => {
   , password: config.join('@')
   })
 
-  if (values(config).some(not(Boolean))) 
+  if (values(key(['type', 'host', 'port', 'database'])(config)).some(not(Boolean))) 
     return { id, invalid: err('incorrect connection string', id, config) }
 
   const connection = (ripple.adaptors[config.type] || noop)(config)
@@ -51,6 +51,7 @@ import header from 'utilise/header'
 import values from 'utilise/values'
 import noop from 'utilise/noop'
 import keys from 'utilise/keys'
+import key from 'utilise/key'
 import not from 'utilise/not'
 import is from 'utilise/is'
 import to from 'utilise/to'

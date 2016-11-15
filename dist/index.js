@@ -21,6 +21,10 @@ var _keys = require('utilise/keys');
 
 var _keys2 = _interopRequireDefault(_keys);
 
+var _key = require('utilise/key');
+
+var _key2 = _interopRequireDefault(_key);
+
 var _not = require('utilise/not');
 
 var _not2 = _interopRequireDefault(_not);
@@ -41,10 +45,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 // -------------------------------------------
 function db(ripple) {
   /* istanbul ignore next */
-var _ref = arguments.length <= 1 || arguments[1] === undefined ? {} : arguments[1];
-
-  var _ref$db = _ref.db;
-  var db = _ref$db === undefined ? {} : _ref$db;
+var _ref = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {},
+      _ref$db = _ref.db,
+      db = _ref$db === undefined ? {} : _ref$db;
 
   log('creating');
   ripple.on('change.db', crud(ripple));
@@ -68,7 +71,7 @@ var connect = function connect(ripple) {
       password: config.join('@')
     });
 
-    if ((0, _values2.default)(config).some((0, _not2.default)(Boolean))) return { id: id, invalid: err('incorrect connection string', id, config) };
+    if ((0, _values2.default)((0, _key2.default)(['type', 'host', 'port', 'database'])(config)).some((0, _not2.default)(Boolean))) return { id: id, invalid: err('incorrect connection string', id, config) };
 
     var connection = (ripple.adaptors[config.type] || _noop2.default)(config);
 
@@ -78,12 +81,11 @@ var connect = function connect(ripple) {
 
 var crud = function crud(ripple) {
   return function (name, change) {
-    var _ref2 = change || {};
-
-    var key = _ref2.key;
-    var value = _ref2.value;
-    var type = _ref2.type;
-    var res = ripple.resources[name];
+    var _ref2 = change || {},
+        key = _ref2.key,
+        value = _ref2.value,
+        type = _ref2.type,
+        res = ripple.resources[name];
 
     if (!(0, _header2.default)('content-type', 'application/data')(res)) return;
     if ((0, _header2.default)('silentdb')(res)) return delete res.headers.silentdb;
